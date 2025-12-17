@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Grid, Typography, CircularProgress, Alert } from '@mui/material';
 import KpiCard from '../components/KpiCard';
-import Breadcrumbs from '../components/Breadcrumbs';
 
 const DashboardPage = ({ title, endpoint }) => {
     const [data, setData] = useState(null);
