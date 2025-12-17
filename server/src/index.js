@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const kpiRoutes = require('./routes/kpiRoutes');
+const agentRoutes = require('./routes/agentRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -10,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/kpi', kpiRoutes);
+app.use('/api', agentRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hypercare Monitoring Agent Backend is running.');

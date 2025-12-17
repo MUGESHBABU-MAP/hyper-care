@@ -1,13 +1,14 @@
 import React from 'react';
-import { Box, Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography, Divider, AppBar } from '@mui/material';
+import { Box, Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography, Divider, AppBar, Button } from '@mui/material';
 import { NavLink, Outlet, useParams } from 'react-router-dom';
-import { Dashboard, Dns, Speed, Schedule, SyncAlt, Security, VerifiedUser, Business, SupportAgent } from '@mui/icons-material';
+import { Dashboard, Dns, Speed, Schedule, SyncAlt, Security, VerifiedUser, Business, SupportAgent, Lightbulb, SmartToy } from '@mui/icons-material';
 import Breadcrumbs from '../components/Breadcrumbs';
 
 const drawerWidth = 280;
 
 const menuItems = [
     { text: 'Overview', icon: <Dashboard />, path: 'overview' },
+    { text: 'KPI Insights', icon: <Lightbulb />, path: 'insights' },
     { text: 'System Connectivity', icon: <Dns />, path: 'system' },
     { text: 'System Performance', icon: <Speed />, path: 'performance' },
     { text: 'Job & Batch Monitoring', icon: <Schedule />, path: 'jobs' },
@@ -25,9 +26,16 @@ const MainLayout = () => {
         <Box sx={{ display: 'flex' }}>
             <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: '#0066cc' }}>
                 <Toolbar>
-                    <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 600 }}>
+                    <SmartToy sx={{ mr: 2 }} />
+                    <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 600, flex: 1 }}>
                         SAP Hypercare Monitoring Dashboard
                     </Typography>
+                    <Button color="inherit" component={NavLink} to="/agents" sx={{ mr: 2 }}>
+                        Agents
+                    </Button>
+                    <Button color="inherit" component={NavLink} to="/systems">
+                        Systems
+                    </Button>
                 </Toolbar>
             </AppBar>
             {systemId && (

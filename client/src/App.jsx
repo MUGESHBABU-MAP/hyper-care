@@ -11,16 +11,22 @@ import SecurityDashboard from './pages/SecurityDashboard';
 import MasterDataDashboard from './pages/MasterDataDashboard';
 import BusinessDashboard from './pages/BusinessDashboard';
 import IncidentDashboard from './pages/IncidentDashboard';
+import AgentManagement from './pages/AgentManagement';
+import KPIInsightsPage from './pages/KPIInsightsPage';
+import AgentExecutionHistory from './pages/AgentExecutionHistory';
 
 function App() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
-        <Route path="/" element={<Navigate replace to="/systems" />} />
+        <Route path="/" element={<Navigate replace to="/agents" />} />
+        <Route path="/agents" element={<AgentManagement />} />
+        <Route path="/agents/:agentId/history" element={<AgentExecutionHistory />} />
         <Route path="/systems" element={<MultiSystemOverview />} />
         <Route path="/systems/:systemId">
           <Route index element={<Navigate to="performance" />} />
           <Route path="overview" element={<OverviewDashboard />} />
+          <Route path="insights" element={<KPIInsightsPage />} />
           <Route path="system" element={<SystemDashboard />} />
           <Route path="performance" element={<PerformanceDashboard />} />
           <Route path="jobs" element={<JobDashboard />} />
