@@ -1,39 +1,51 @@
 import React from 'react';
 import { Breadcrumbs as MuiBreadcrumbs, Link, Typography } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Home } from '@mui/icons-material';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { Home, NavigateNext } from '@mui/icons-material';
 
 const breadcrumbNameMap = {
-    '/dashboard/overview': 'Overview',
-    '/dashboard/system': 'System Connectivity',
-    '/dashboard/performance': 'System Performance',
-    '/dashboard/jobs': 'Job & Batch Monitoring',
-    '/dashboard/integration': 'Integration & Interfaces',
-    '/dashboard/security': 'Security & Authorization',
-    '/dashboard/masterdata': 'Data & Master Data',
-    '/dashboard/business': 'Business Process KPIs',
-    '/dashboard/incidents': 'Incident & Support KPIs',
+  'overview': 'Overview',
+  'system': 'System Connectivity',
+  'performance': 'System Performance',
+  'jobs': 'Job & Batch Monitoring',
+  'integration': 'Integration & Interfaces',
+  'security': 'Security & Authorization',
+  'masterdata': 'Data & Master Data',
+  'business': 'Business Process KPIs',
+  'incidents': 'Incident & Support KPIs',
 };
 
 const Breadcrumbs = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const params = useParams();
 
-    const currentPage = breadcrumbNameMap[location.pathname];
+    const pathnames = location.pathname.split('/').filter((x) => x);
 
     return (
-        <MuiBreadcrumbs sx={{ mb: 2 }}>
+        <MuiBreadcrumbs separator={<NavigateNext fontSize="small" />} sx={{ mb: 4 }}>
             <Link
                 underline="hover"
-                sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: '#666' }}
-                onClick={() => navigate('/dashboard/overview')}
+                sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                color="inherit"
+                onClick={() => navigate('/systems')}
             >
-                <Home sx={{ mr: 0.5, fontSize: 18 }} />
-                Home
+                <Home sx={{ mr: 0.5, fontSize: 'inherit' }} />
+                Systems Overview
             </Link>
-            {location.pathname !== '/dashboard/overview' && (
-                <Typography color="text.primary" sx={{ fontWeight: 500 }}>
-                    {currentPage}
+            {params.systemId && (
+                 <Link
+                    underline="hover"
+                    sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                    color="inherit"
+                    onClick={() => navigate(`/systems/${params.systemId}/performance`)}
+                >
+                    {params.systemId}
+                </Link>
+            )}
+            {pathnames.length > 2 && (
+                <Typography color="text.primary">
+                    {breadcrumbNameMap[pathnames[2]]}
                 </Typography>
             )}
         </MuiBreadcrumbs>

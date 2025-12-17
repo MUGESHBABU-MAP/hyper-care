@@ -28,12 +28,16 @@ const theme = createTheme({
   },
 });
 
+import { SystemProvider } from './context/SystemContext';
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
+        <SystemProvider>
+          <CssBaseline />
+          <App />
+        </SystemProvider>
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,

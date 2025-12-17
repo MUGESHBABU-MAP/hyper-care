@@ -29,7 +29,6 @@ const DashboardPage = ({ title, endpoint }) => {
 
     return (
         <div>
-            <Breadcrumbs />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                 <Typography variant="h4" sx={{ color: '#1a1a1a', fontWeight: 600 }}>
                     {title}
