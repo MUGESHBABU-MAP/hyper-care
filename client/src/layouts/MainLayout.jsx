@@ -6,6 +6,7 @@ import Breadcrumbs from '../components/Breadcrumbs';
 
 const drawerWidth = 280;
 
+// Full list preserved for future use — we will control visibility via `allowedMenuTexts` below.
 const menuItems = [
     { text: 'Overview', icon: <Dashboard />, path: 'overview' },
     { text: 'KPI Insights', icon: <Lightbulb />, path: 'insights' },
@@ -17,6 +18,36 @@ const menuItems = [
     { text: 'Data & Master Data', icon: <VerifiedUser />, path: 'masterdata' },
     { text: 'Business Process KPIs', icon: <Business />, path: 'business' },
     { text: 'Incident & Support KPIs', icon: <SupportAgent />, path: 'incidents' },
+];
+
+// High-level categories (preserved in code; rendering uses route map below)
+const highLevelMenu = [
+    { group: 'System Stability', items: [
+        { text: 'Availability', path: 'overview' },
+        { text: 'Job Monitoring', path: 'jobs' },
+        { text: 'Dump Monitoring', path: 'performance' },
+    ]},
+    { group: 'Performance', items: [
+        { text: 'Performance', path: 'performance' },
+    ]},
+    { group: 'Integration Health', items: [
+        { text: 'Integration Monitoring', path: 'integration' },
+    ]},
+    { group: 'Security & Risk', items: [
+        { text: 'Security & Audit', path: 'security' },
+    ]},
+    { group: 'Service Operations', items: [
+        { text: 'Incident Mgmt', path: 'incidents' },
+    ]},
+    { group: 'Integration', items: [
+        { text: 'Interfaces', path: 'integration' },
+    ]},
+    { group: 'Security', items: [
+        { text: 'Security', path: 'security' },
+    ]},
+    { group: 'System', items: [
+        { text: 'System Health', path: 'system' },
+    ]},
 ];
 
 const MainLayout = () => {
@@ -61,39 +92,48 @@ const MainLayout = () => {
                             {systemId}
                         </Typography>
                         <Divider />
+                        {/* Render grouped high-level categories (non-destructive). */}
                         <List>
-                            {menuItems.map((item) => (
-                                <ListItem 
-                                    button 
-                                    component={NavLink} 
-                                    to={`/systems/${systemId}/${item.path}`} 
-                                    key={item.text}
-                                    sx={{
-                                        mx: 1,
-                                        borderRadius: 1,
-                                        mb: 0.5,
-                                        '&.active': {
-                                            backgroundColor: '#e3f2fd',
-                                            '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-                                                color: '#0066cc',
-                                                fontWeight: 600,
-                                            },
-                                        },
-                                        '&:hover': {
-                                            backgroundColor: '#f5f5f5',
-                                        },
-                                    }}
-                                >
-                                    <ListItemIcon sx={{ color: '#666', minWidth: 40 }}>
-                                        {item.icon}
-                                    </ListItemIcon>
-                                    <ListItemText 
-                                        primary={item.text} 
-                                        primaryTypographyProps={{ 
-                                            fontSize: '0.9rem'
-                                        }}
-                                    />
-                                </ListItem>
+                            {highLevelMenu.map((group) => (
+                                <Box key={group.group} sx={{ px: 1, mb: 1 }}>
+                                    <Typography variant="overline" color="text.secondary" sx={{ px: 1 }}>
+                                        {group.group}
+                                    </Typography>
+                                    {group.items.map(item => (
+                                        <ListItem
+                                            button
+                                            component={NavLink}
+                                            to={`/systems/${systemId}/${item.path}`}
+                                            key={group.group + '-' + item.text}
+                                            sx={{
+                                                mx: 1,
+                                                borderRadius: 1,
+                                                mb: 0.5,
+                                                '&.active': {
+                                                    backgroundColor: '#e3f2fd',
+                                                    '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+                                                        color: '#0066cc',
+                                                        fontWeight: 600,
+                                                    },
+                                                },
+                                                '&:hover': {
+                                                    backgroundColor: '#f5f5f5',
+                                                },
+                                            }}
+                                        >
+                                            <ListItemIcon sx={{ color: '#666', minWidth: 40 }}>
+                                                {/* Try to find a matching icon from menuItems (fallback to Dashboard) */}
+                                                { (menuItems.find(m => m.text.toLowerCase().includes(item.text.split(' ')[0].toLowerCase())) || menuItems[0]).icon }
+                                            </ListItemIcon>
+                                            <ListItemText 
+                                                primary={item.text} 
+                                                primaryTypographyProps={{ 
+                                                    fontSize: '0.9rem'
+                                                }}
+                                            />
+                                        </ListItem>
+                                    ))}
+                                </Box>
                             ))}
                         </List>
                     </Box>

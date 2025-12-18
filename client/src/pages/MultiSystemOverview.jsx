@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { SystemContext } from '../context/SystemContext';
 import SystemCard from '../components/SystemCard';
-import { Grid, Container, Typography, Box } from '@mui/material';
+import { Grid, Container, Typography, Box, Chip, Stack } from '@mui/material';
 
 const MultiSystemOverview = () => {
   const { systems } = useContext(SystemContext);
@@ -16,6 +16,7 @@ const MultiSystemOverview = () => {
           At-a-glance health summary of all connected SAP systems.
         </Typography>
       </Box>
+      {/* High-level categories removed from this page per request */}
       <Grid container spacing={4}>
         {systems.map((system) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={system.systemId}>

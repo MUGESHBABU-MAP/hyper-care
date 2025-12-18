@@ -13,9 +13,11 @@ const KpiCard = ({ title, value, status = 'neutral', trendData = [], dataSource 
     const statusColor = STATUS_COLORS[status] || STATUS_COLORS.neutral;
 
     const getDataSourceColor = () => {
-        if (dataSource === 'SAP') return '#4caf50';
-        if (dataSource === 'MOCK') return '#ff9800';
-        if (dataSource === 'MIXED') return '#2196f3';
+        if (!dataSource) return '#9e9e9e';
+        const ds = String(dataSource).toLowerCase();
+        if (ds.includes('sap')) return '#4caf50';
+        if (ds.includes('mock')) return '#ff9800';
+        if (ds.includes('mixed')) return '#2196f3';
         return '#9e9e9e';
     };
 
