@@ -7,7 +7,9 @@ const {
   deleteAgent,
   getExecutionHistory,
   getKPIDefinitions,
-  getKPIsByCategory
+  getKPIsByCategory,
+  executeAgent,
+  getAgentResults
 } = require('../services/agentService');
 const { getKPIInsight } = require('../services/kpiInsights');
 const { generateReport, formatReportAsCSV } = require('../services/reportService');
@@ -69,8 +71,32 @@ router.delete('/agents/:id', (req, res) => {
 // Get execution history
 router.get('/agents/:id/history', (req, res) => {
   const hours = parseInt(req.query.hours) || 24;
-  const history = getExecutionHistory(req.params.id, hours);
+  const systemId = req.query.systemId || null;
+  const history = getExecutionHistory(req.params.id, hours, systemId);
   res.json(history);
+});
+
+// Execute agent manually
+router.post('/agents/:id/execute', async (req, res) => {
+  try {
+    const results = await executeAgent(req.params.id);
+    if (!results) {
+      return res.status(404).json({ error: 'Agent not found or disabled' });
+    }
+    res.json({ message: 'Agent executed successfully', results });
+  } catch (error) {
+    console.error('Error executing agent:', error);
+    res.status(500).json({ error: 'Failed to execute agent' });
+  }
+});
+
+// Get agent results (multi-system analysis)
+router.get('/agents/:id/results', (req, res) => {
+  const results = getAgentResults(req.params.id);
+  if (!results) {
+    return res.status(404).json({ error: 'Agent not found' });
+  }
+  res.json(results);
 });
 
 // Generate report

@@ -14,36 +14,46 @@ const generateReport = (agentId, hours = 24) => {
       failureCount: history.filter(h => h.status === 'error').length,
       avgDuration: history.reduce((sum, h) => sum + h.duration, 0) / history.length || 0
     },
-    kpiData: {}
+    systemData: {}
   };
   
-  // Group by KPI
-  const kpiGroups = {};
+  // Group by System and KPI
+  const systemGroups = {};
   history.forEach(exec => {
-    if (!kpiGroups[exec.kpiId]) {
-      kpiGroups[exec.kpiId] = [];
+    if (!systemGroups[exec.systemId]) {
+      systemGroups[exec.systemId] = {};
     }
-    kpiGroups[exec.kpiId].push(exec);
+    if (!systemGroups[exec.systemId][exec.kpiId]) {
+      systemGroups[exec.systemId][exec.kpiId] = [];
+    }
+    systemGroups[exec.systemId][exec.kpiId].push(exec);
   });
   
-  // Build KPI sections
-  Object.keys(kpiGroups).forEach(kpiId => {
-    const kpiDef = KPI_DEFINITIONS.find(k => k.id === kpiId);
-    const executions = kpiGroups[kpiId];
+  // Build system sections
+  Object.keys(systemGroups).forEach(systemId => {
+    const kpiGroups = systemGroups[systemId];
+    const systemKpiData = {};
     
-    report.kpiData[kpiId] = {
-      name: kpiDef?.name || kpiId,
-      category: kpiDef?.category || 'Unknown',
-      frequency: kpiDef?.frequency || 'Unknown',
-      executions: executions.length,
-      values: executions.map(e => ({
-        timestamp: e.timestamp,
-        value: e.value,
-        status: e.status
-      })),
-      latestValue: executions[0]?.value,
-      avgValue: calculateAverage(executions.map(e => e.value))
-    };
+    Object.keys(kpiGroups).forEach(kpiId => {
+      const kpiDef = KPI_DEFINITIONS.find(k => k.id === kpiId);
+      const executions = kpiGroups[kpiId];
+      
+      systemKpiData[kpiId] = {
+        name: kpiDef?.name || kpiId,
+        category: kpiDef?.category || 'Unknown',
+        frequency: kpiDef?.frequency || 'Unknown',
+        executions: executions.length,
+        values: executions.map(e => ({
+          timestamp: e.timestamp,
+          value: e.value,
+          status: e.status
+        })),
+        latestValue: executions[0]?.value,
+        avgValue: calculateAverage(executions.map(e => e.value))
+      };
+    });
+    
+    report.systemData[systemId] = systemKpiData;
   });
   
   return report;
@@ -67,19 +77,23 @@ const formatReportAsCSV = (report) => {
   csv += `Failure Count,${report.summary.failureCount}\n`;
   csv += `Avg Duration (ms),${report.summary.avgDuration.toFixed(2)}\n\n`;
   
-  csv += 'KPI Details\n';
-  csv += 'KPI Name,Category,Frequency,Executions,Latest Value,Average Value\n';
-  
-  Object.values(report.kpiData).forEach(kpi => {
-    csv += `${kpi.name},${kpi.category},${kpi.frequency},${kpi.executions},${kpi.latestValue},${kpi.avgValue}\n`;
-  });
-  
-  csv += '\nDetailed Execution History\n';
-  csv += 'KPI Name,Timestamp,Value,Status\n';
-  
-  Object.values(report.kpiData).forEach(kpi => {
-    kpi.values.forEach(v => {
-      csv += `${kpi.name},${v.timestamp},${v.value},${v.status}\n`;
+  // Process each system
+  Object.keys(report.systemData).forEach(systemId => {
+    csv += `\n--- System: ${systemId} ---\n`;
+    csv += 'KPI Name,Category,Frequency,Executions,Latest Value,Average Value\n';
+    
+    const systemKpis = report.systemData[systemId];
+    Object.values(systemKpis).forEach(kpi => {
+      csv += `${kpi.name},${kpi.category},${kpi.frequency},${kpi.executions},${kpi.latestValue},${kpi.avgValue}\n`;
+    });
+    
+    csv += '\nDetailed Execution History\n';
+    csv += 'KPI Name,Timestamp,Value,Status\n';
+    
+    Object.values(systemKpis).forEach(kpi => {
+      kpi.values.forEach(v => {
+        csv += `${kpi.name},${v.timestamp},${v.value},${v.status}\n`;
+      });
     });
   });
   
