@@ -16,6 +16,9 @@ const { generateReport, formatReportAsCSV } = require('../services/reportService
 
 const router = express.Router();
 
+const { startAgent, stopAgent, startAll } = require('../services/agentScheduler');
+const { readJSON } = require('../utils/persistence');
+
 // Get all KPI definitions
 router.get('/kpi-definitions', (req, res) => {
   res.json(getKPIDefinitions());
@@ -37,6 +40,21 @@ router.post('/kpi-insights', (req, res) => {
 router.post('/agents', (req, res) => {
   const agent = createAgent(req.body);
   res.status(201).json(agent);
+});
+
+// Start agent schedule
+router.post('/agents/:id/start', async (req, res) => {
+  const agent = getAgentById(req.params.id);
+  if (!agent) return res.status(404).json({ error: 'Agent not found' });
+  await startAgent(agent);
+  res.json({ message: 'Agent started' });
+});
+
+// Stop agent schedule
+router.post('/agents/:id/stop', (req, res) => {
+  const ok = stopAgent(req.params.id);
+  if (!ok) return res.status(404).json({ error: 'Agent not running' });
+  res.json({ message: 'Agent stopped' });
 });
 
 // Get all agents

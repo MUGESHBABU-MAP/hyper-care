@@ -1,0 +1,13 @@
+[
+  {
+    "id": "agent_1766380645574",
+    "name": "Test",
+    "description": "Test",
+    "systems": [],
+    "schedule": "daily",
+    "enabled": true,
+    "createdAt": "2025-12-22T05:17:25.574Z",
+    "lastRun": null,
+    "nextRun": "2025-12-22T18:30:00.000Z"
+  }
+]

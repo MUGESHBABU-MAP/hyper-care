@@ -1,8 +1,23 @@
 const { KPI_DEFINITIONS } = require('../config/kpiDefinitions');
 
+const { readJSON, writeJSON } = require('../utils/persistence');
 // In-memory storage for agents and execution history
 const agents = new Map();
 const executionHistory = new Map();
+
+// Load persisted agents if present
+(() => {
+  try {
+    const persisted = readJSON('agents.json', []);
+    persisted.forEach(a => {
+      agents.set(a.id, a);
+      executionHistory.set(a.id, []);
+    });
+    console.log(`[agentService] Loaded ${persisted.length} agents from persistence`);
+  } catch (err) {
+    console.error('Failed to load persisted agents', err);
+  }
+})();
 
 const createAgent = (agentData) => {
   const agent = {
@@ -19,6 +34,7 @@ const createAgent = (agentData) => {
   
   agents.set(agent.id, agent);
   executionHistory.set(agent.id, []);
+  persistAgents();
   return agent;
 };
 
@@ -53,12 +69,14 @@ const updateAgent = (id, updates) => {
   
   const updated = { ...agent, ...updates, updatedAt: new Date().toISOString() };
   agents.set(id, updated);
+  persistAgents();
   return updated;
 };
 
 const deleteAgent = (id) => {
   agents.delete(id);
   executionHistory.delete(id);
+  persistAgents();
 };
 
 const recordExecution = (agentId, systemId, kpiId, result) => {
@@ -74,6 +92,16 @@ const recordExecution = (agentId, systemId, kpiId, result) => {
   
   if (history.length > 1000) history.pop();
   executionHistory.set(agentId, history);
+  // optionally persist recent history or keep in memory (skipped for now)
+};
+
+const persistAgents = () => {
+  try {
+    const list = Array.from(agents.values());
+    writeJSON('agents.json', list);
+  } catch (err) {
+    console.error('persistAgents error', err);
+  }
 };
 
 const getExecutionHistory = (agentId, hours = 24, systemId = null) => {
